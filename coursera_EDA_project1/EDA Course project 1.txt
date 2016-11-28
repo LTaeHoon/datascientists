@@ -1,0 +1,27 @@
+EDA Course project 1
+
+머신 러닝 데이터로 유명한 저장소, UC Irvine Machine Learning Repository의 데이터를 사용했다. 
+특히, 우리는 "individual household electric power consumption Data set"를 사용할 것이다.
+
+Dataset: Electric power consumption
+Description : 거의 4년의 기간 동안 1분 단위 샘플링한 가구당 전력 소비 측정
+다양한 전기량과 하위 계측값도 사용가능하다.
+
+UCI 웹사이트로 부터 데이터세트 9 변수의 기술을 아래와 같이 가져왔다.
+
+1.Date: Date in format dd/mm/yyyy
+2.Time: time in format hh:mm:ss
+3.Global_active_power: household global minute-averaged active power (in kilowatt)
+4.Global_reactive_power: household global minute-averaged reactive power (in kilowatt)
+5.Voltage: minute-averaged voltage (in volt)
+6.Global_intensity: household global minute-averaged current intensity (in ampere)
+7.Sub_metering_1: energy sub-metering No. 1 (in watt-hour of active energy). It corresponds to the kitchen, containing mainly a dishwasher, an oven and a microwave (hot plates are not electric but gas powered).
+8.Sub_metering_2: energy sub-metering No. 2 (in watt-hour of active energy). It corresponds to the laundry room, containing a washing-machine, a tumble-drier, a refrigerator and a light.
+9.Sub_metering_3: energy sub-metering No. 3 (in watt-hour of active energy). It corresponds to an electric water-heater and an air-conditioner.
+
+평가기준
+1. 제출한 git 저장소의 URL이 있는가?
+2. github 저장소에 오리지날 포크 이후 적어도 한개 커밋이 포함되어 있는가?
+3. github 저장소에 플롯 파일들을 검사하고, 플롯파일이 올바른 파일 포맷으로 보이는가?
+4. 각 플롯이 올바르게 보이는가?
+5. R code의  각 세트가 참조 플롯을 생성하는 가?
