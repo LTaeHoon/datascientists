@@ -39,3 +39,8 @@ image(t(dataMatrixOrdered)[,nrow(dataMatrixOrdered):1])
 plot(svd1$u[,1],40:1,xlab="Row",ylab="First left singular vector",pch=19)
 plot(svd1$v[,1],xlab="Column",ylab="First right singular vector",pch=19)
 
+par(mfrow=c(1,2))
+plot(svd1$d, xlab="Column", ylab="Singular value",pch=19)
+plot(svd1$d^2/sum(svd1$d^2),xlab = "Column",ylab = "Prop. of variance explained")
+
+
