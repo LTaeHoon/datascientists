@@ -39,6 +39,7 @@ image(t(dataMatrixOrdered)[,nrow(dataMatrixOrdered):1])
 plot(svd1$u[,1],40:1,xlab="Row",ylab="First left singular vector",pch=19)
 plot(svd1$v[,1],xlab="Column",ylab="First right singular vector",pch=19)
 
+<<<<<<< HEAD
 #Components of the SVD - Variance explained
 par(mfrow=c(1,2))
 plot(svd1$d,xlab='Column',ylab= "singular value",pch=19)
@@ -49,4 +50,10 @@ svd1 <- svd(scale(dataMatrixOrdered))
 pca1 <- prcomp(dataMatrixOrdered,scale=TRUE)
 plot(pca1$rotation[,1],svd1$v[,1],pch=19,xlab="Pricipal Component 1",ylab="Right Singular Vector 1")
 abline(c(0,1))
+=======
+par(mfrow=c(1,2))
+plot(svd1$d, xlab="Column", ylab="Singular value",pch=19)
+plot(svd1$d^2/sum(svd1$d^2),xlab = "Column",ylab = "Prop. of variance explained")
+
+>>>>>>> 57d128810d9bb602dbfb6ac83da9ca6e77866089
 
