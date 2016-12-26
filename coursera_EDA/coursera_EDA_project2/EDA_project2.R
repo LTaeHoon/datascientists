@@ -15,6 +15,7 @@ sum1999 <- with(fips1999, tapply(Emissions,fips,sum,na.rm=T))
 sum2002 <- with(fips2002, tapply(Emissions,fips,sum,na.rm=T))
 sum2005 <- with(fips2005, tapply(Emissions,fips,sum,na.rm=T))
 sum2008 <- with(fips2008, tapply(Emissions,fips,sum,na.rm=T))
+
 str(sum1999)
 names(sum1999)
 #1999년 U.S. county 별 pm2.5 배출량 합
@@ -22,8 +23,25 @@ d1999 <- data.frame(fips = names(sum1999), Emissions = sum1999)
 d2002 <- data.frame(fips = names(sum2002), Emissions = sum2002)
 d2005 <- data.frame(fips = names(sum2005), Emissions = sum2005)
 d2008 <- data.frame(fips = names(sum2008), Emissions = sum2008)
-  
-summary(d1999)
+
+mrg <- merge(d1999,d2002,by="fips")
+mrg <- merge(mrg,d2005,by="fips")
+mrg <- merge(mrg,d2008,by="fips")
+mrg <- as.data.frame(mrg)
+colnames(mrg) <- c('fips','1999sum','2002sum','2005sum','2008sum')
+head(mrg)
+
+par(mfrow=c(1,1))
+with(mrg,plot(rep(1999,nrow(mrg)),mrg[,2],xlim=c(1999,2008),ylim =))
+with(mrg,points(rep(2002,nrow(mrg)),mrg[,3]))
+with(mrg,points(rep(2005,nrow(mrg)),mrg[,4]))
+with(mrg,points(rep(2008,nrow(mrg)),mrg[,5]))
+segments(rep(1999,nrow(mrg)),mrg[,2],rep(2002,nrow(mrg)),mrg[,3])
+segments(rep(2002,nrow(mrg)),mrg[,3],rep(2005,nrow(mrg)),mrg[,4])
+segments(rep(2005,nrow(mrg)),mrg[,4],rep(2008,nrow(mrg)),mrg[,5])
+
+?segments
+
 # 2. Have total emissions from PM2.5 decreased in the Baltimore City, Maryland (fips == "24510") from 1999 to 2008? Use the base plotting system to make a plot answering this question.
 # 3. Of the four types of sources indicated by the type (point, nonpoint, onroad, nonroad) variable, which of these four sources have seen decreases in emissions from 1999–2008 for Baltimore City? Which have seen increases in emissions from 1999–2008? Use the ggplot2 plotting system to make a plot answer this question.
 # 4. Across the United States, how have emissions from coal combustion-related sources changed from 1999–2008?
