@@ -32,11 +32,37 @@ plot(hClusterUpdated)
 
 #Statistical prediction/modeling
 trainSpam$numtype = as.numeric(trainSpam$type)-1
-costFunction = function(x,y) sum(x!=(y>0.05))
+costFunction = function(x,y) sum(x!=(y>0.5)) #x,y가 같으면 0, 다르면 1 x는 관측치, y는 예측치
 cvError = rep(NA,55)
 library(boot)
 for(i in 1:55){
-  lmFormula = reformulate(names(trainSpam)[i],response = "numType")
+  lmFormula = reformulate(names(trainSpam)[i],response = "numtype")
   glmFit = glm(lmFormula, family = "binomial", data=trainSpam)
-  cvError[i] = cv.glm()
+  cvError[i] = cv.glm(trainSpam,glmFit,costFunction,2)$delta[2]
 }
+
+#which predictor has minimum cross-validated error?
+names(trainSpam)[which.min(cvError)]
+
+
+#get measure of uncertainty
+
+## use the best model from the group
+predictionModel = glm(numtype ~ charDollar,family = "binomial",data=trainSpam)
+
+##Get predictions on the test set
+predictionTest = predict(predictionModel,testSpam)
+predictedSpam = rep("nonspam",dim(testSpam)[1])
+
+##Classify as 'spam' for those with prob >0.5
+predictedSpam[predictionModel$fitted.values >0.5]= "spam"
+predictedSpam = na.omit(predictedSpam)
+##Classification table
+table(predictedSpam, testSpam$type)
+# predictedSpam nonspam spam
+# nonspam    1329  467
+# spam         54  446
+
+##Error rate
+(54+467)/(1329+467+54+446)
+# [1] 0.2269164
