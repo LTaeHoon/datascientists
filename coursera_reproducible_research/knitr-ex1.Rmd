@@ -1,0 +1,62 @@
+#My First knitr Document
+Taehoon Lee
+
+##Introduction
+
+This is some text(i.e. a "text chunk").Here is a code chunk
+```{r simulation, echo=FALSE}
+set.seed(1)
+x<-rnorm(100)
+mean(x)
+```
+
+```{r simulation2, echo=FALSE,results='hide'}
+set.seed(1)
+x<-rnorm(100)
+mean(x)
+```
+
+```{r computetime,echo=FALSE}
+time <- format(Sys.time(),"%a %b %d %X %Y")
+rand <- rnorm(1)
+```
+
+the current time is `r time`. My favorite random number is `r rand`.
+
+Let's first simulate some data.
+```{r simulatedata,echo=FALSE}
+x <- rnorm(100); y<-x+rnorm(100,sd=0.5)
+```
+Here is a scatterplot of the data.
+```{r scatterplot,fig.height=4}
+par(mar=c(5,4,1,1),las = 1)
+plot(x,y,main="My Simulated Data")
+```
+
+```{r fitmodel}
+library(datasets)
+data("airquality")
+fit <- lm(Ozone~ Wind+Temp+Solar.R,data=airquality)
+```
+Here is a table of regression coefficients.
+```{r showtable,results="asis"}
+library(xtable)
+xt <- xtable(summary(fit))
+print(xt,type="html")
+```
+
+```{r setoptions,echo=FALSE}
+library(knitr)
+opts_chunk$set(echo=FALSE,results="hide")
+```
+First simulate data
+```{r simulatedata1,echo=TRUE}
+x <- rnorm(100); y <- x+rnorm(100,sd=0.5)
+```
+Here is a scatterplot of the data.
+
+```{r scatterplot1,fig.height=4}
+par(mar=c(5,4,1,1),las=1)
+plot(x,y,main="My Simulated Data")
+```
+
