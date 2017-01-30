@@ -64,7 +64,7 @@ exp <- function(e){
   else if(e %in% c("b","B"))
     return(9)
   else if(!is.na(as.numeric(e)))
-    return(as.numeric(e))
+    return(suppressWarnings(as.numeric(e)))
   else if(e %in% c("?","","+","-"))
     return(0)
   else{
@@ -77,6 +77,8 @@ i have created new column(propdmg, cropdmg) using the exp function.
 ```{r}
 proexp <- sapply(storm_data_sub$PROPDMGEXP,FUN=exp)
 storm_data_sub$propdamage<-storm_data_sub$PROPDMG*(10**proexp)
+cropexp <- sapply(storm_data_sub$CROPDMGEXP,FUN=exp)
+storm_data_sub$cropdamage<-storm_data_sub$CROPDMG*(10**cropexp)
 ```
 
 ## Result
