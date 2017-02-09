@@ -30,29 +30,36 @@ library(stringr)
 ```
 The first step is to read the data. you should set working directory you work now.
 ```{r cache=TRUE}
-setwd("E:/github/datascientist/coursera_reproducible_research")
+# setwd("E:/github/datascientist/coursera_reproducible_research")
+setwd("C:/Users/acorn/git/data scientist/coursera_reproducible_research")
 storm_data <- read.csv("repdata-data-StormData.csv",stringsAsFactors = FALSE)
+stormdata <- read.csv(bzfile("repdata-data-StormData.csv.bz2"),sep=",",header = T,stringsAsFactors = F)
 ```
 
-Subsetting the needed column for analysis.
+after I read the data, Subsetting the needed column for analysis.
 ```{r}
-storm_data_sub <- storm_data[,c("EVTYPE","FATALITIES","INJURIES","PROPDMG","PROPDMGEXP","CROPDMG","CROPDMGEXP")]
+storm_data_sub <- stormdata[,c("EVTYPE","FATALITIES","INJURIES","PROPDMG","PROPDMGEXP","CROPDMG","CROPDMGEXP")]
 head(storm_data_sub)
+stormdatasub<-storm_data_sub[1:547364,]
 ```
 - Population health
 first of all, I have prepared the data for fatalities and injuries.
 ```{r}
-fatalities <- aggregate(storm_data_sub$FATALITIES,by=list(storm_data_sub$EVTYPE),sum)
+stormdatasub$FATALITIES <- as.numeric(stormdatasub$FATALITIES)
+stormdatasub$INJURIES <- as.numeric(stormdatasub$INJURIES)
+fatalities <- aggregate(stormdatasub$FATALITIES,by=list(stormdatasub$EVTYPE),sum)
 names(fatalities)<- c("EVTYPE","fatalities")
 fatalities <- fatalities[order(fatalities$fatalities,decreasing = T),]
-injuries <- aggregate(storm_data_sub$INJURIES,by=list(storm_data_sub$EVTYPE),sum)
+injuries <- aggregate(stormdatasub$INJURIES,by=list(stormdatasub$EVTYPE),sum)
 names(injuries)<- c("EVTYPE","injuries")
 injuries <- injuries[order(injuries$injuries,decreasing = T),]
 ```
 
+
 Second, i also have prepared the data for Economic consequences.
-Since the exponential value like propdmgexp, cropdmgexp has stored by letters(h = hundred, k = thousand, m = million, b = billion),  so that should be converted to number.
-for this, i have created a related function.
+Since the exponential value like propdmgexp, cropdmgexp has stored by letters(h = hundred, k = thousand, m = million, b = billion),  so that 
+it should be converted to number.
+for this, i have created a converting function.
 ```{r}
 exp <- function(e){
   if(e %in% c("h","H"))
@@ -72,37 +79,53 @@ exp <- function(e){
   }
 }
 ```
-
-i have created new column(propdmg, cropdmg) using the exp function.
+after this is done,
+i have created new column(propdmg, cropdmg).
 ```{r}
-proexp <- sapply(storm_data_sub$PROPDMGEXP,FUN=exp)
-storm_data_sub$propdamage<-storm_data_sub$PROPDMG*(10**proexp)
-cropexp <- sapply(storm_data_sub$CROPDMGEXP,FUN=exp)
-storm_data_sub$cropdamage<-storm_data_sub$CROPDMG*(10**cropexp)
+proexp <- sapply(stormdatasub$PROPDMGEXP,FUN=exp)
+stormdatasub$PROPDMG <- as.numeric(stormdatasub$PROPDMG)
+stormdatasub$propdamage<-stormdatasub$PROPDMG*(10**proexp)
+cropexp <- sapply(stormdatasub$CROPDMGEXP,FUN=exp)
+stormdatasub$CROPDMG <- as.numeric(stormdatasub$CROPDMG)
+stormdatasub$cropdamage<-stormdatasub$CROPDMG*(10**cropexp)
 ```
+and i have made the data for Economic consequences.
+```{r}
+propdamage <- aggregate(stormdatasub$propdamage,by=list(stormdatasub$EVTYPE),sum)
+names(propdamage) <- c("EVTYPE","propdamage")
+cropdamage <- aggregate(stormdatasub$cropdamage,by=list(stormdatasub$EVTYPE),sum)
+names(cropdamage) <- c("EVTYPE","cropdamage")
 
+```
 ## Result
+1. Across the United States, which types of events (as indicated in the EVTYPE variable) most harmful with respect to population health?
+
+```{r}
+par(mfrow=c(1,2))
+fatalities$EVTYPE <- factor(fatalities$EVTYPE,levels = fatalities$EVTYPE)
+fatal <- fatalities[1:10,]
+g1<-ggplot(fatal,aes(x=EVTYPE,y=fatalities,fill=fatalities))+
+  geom_bar(stat="identity")+
+  geom_text(aes(label=fatalities))+
+  theme(axis.text.x=element_text(angle=90))+
+  xlab("EVTYPE")+
+  ylab("Number of fatalities")+
+  ggtitle("Weather type TOP10 that affected the population health in US")
 
 
-
-
-
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+injuries$EVTYPE <- factor(injuries$EVTYPE,levels = injuries$EVTYPE)
+inju <- injuries[1:10,]
+g2<-ggplot(inju,aes(x=EVTYPE,y=injuries,fill=injuries))+
+  geom_bar(stat="identity")+
+  geom_text(aes(label=injuries))+
+  theme(axis.text.x=element_text(angle=90))+
+  xlab("EVTYPE")+
+  ylab("Number of injuries")
+library(gridExtra)
+grid.arrange(g1, g2, nrow =2)
+  
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
