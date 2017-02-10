@@ -23,16 +23,15 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 the following packages will be required.
-```{r}
-library(dplyr)
+```{r warning=FALSE}
 library(ggplot2)
-library(stringr)
+library(gridExtra)
 ```
 The first step is to read the data. you should set working directory you work now.
-```{r cache=TRUE}
+```{r cache=TRUE, warning=FALSE}
 # setwd("E:/github/datascientist/coursera_reproducible_research")
 setwd("C:/Users/acorn/git/data scientist/coursera_reproducible_research")
-storm_data <- read.csv("repdata-data-StormData.csv",stringsAsFactors = FALSE)
+# storm_data <- read.csv("repdata-data-StormData.csv",stringsAsFactors = FALSE)
 stormdata <- read.csv(bzfile("repdata-data-StormData.csv.bz2"),sep=",",header = T,stringsAsFactors = F)
 ```
 
@@ -81,7 +80,7 @@ exp <- function(e){
 ```
 after this is done,
 i have created new column(propdmg, cropdmg).
-```{r}
+```{r warning=FALSE}
 proexp <- sapply(stormdatasub$PROPDMGEXP,FUN=exp)
 stormdatasub$PROPDMG <- as.numeric(stormdatasub$PROPDMG)
 stormdatasub$propdamage<-stormdatasub$PROPDMG*(10**proexp)
@@ -90,22 +89,25 @@ stormdatasub$CROPDMG <- as.numeric(stormdatasub$CROPDMG)
 stormdatasub$cropdamage<-stormdatasub$CROPDMG*(10**cropexp)
 ```
 and i have made the data for Economic consequences.
-```{r}
+```{r }
 propdamage <- aggregate(stormdatasub$propdamage,by=list(stormdatasub$EVTYPE),sum)
 names(propdamage) <- c("EVTYPE","propdamage")
+propdamage <- propdamage[order(propdamage$propdamage,decreasing = T),]
 cropdamage <- aggregate(stormdatasub$cropdamage,by=list(stormdatasub$EVTYPE),sum)
 names(cropdamage) <- c("EVTYPE","cropdamage")
+cropdamage <- cropdamage[order(cropdamage$cropdamage,decreasing = T),]
 
 ```
 ## Result
 1. Across the United States, which types of events (as indicated in the EVTYPE variable) most harmful with respect to population health?
 
 ```{r}
-par(mfrow=c(1,2))
+
 fatalities$EVTYPE <- factor(fatalities$EVTYPE,levels = fatalities$EVTYPE)
 fatal <- fatalities[1:10,]
-g1<-ggplot(fatal,aes(x=EVTYPE,y=fatalities,fill=fatalities))+
+g1<-ggplot(fatal,aes(x=reorder(EVTYPE,fatalities),y=fatalities,fill=fatalities))+
   geom_bar(stat="identity")+
+  coord_flip()+
   geom_text(aes(label=fatalities))+
   theme(axis.text.x=element_text(angle=90))+
   xlab("EVTYPE")+
@@ -115,17 +117,45 @@ g1<-ggplot(fatal,aes(x=EVTYPE,y=fatalities,fill=fatalities))+
 
 injuries$EVTYPE <- factor(injuries$EVTYPE,levels = injuries$EVTYPE)
 inju <- injuries[1:10,]
-g2<-ggplot(inju,aes(x=EVTYPE,y=injuries,fill=injuries))+
+g2<-ggplot(inju,aes(x=reorder(EVTYPE,injuries),y=injuries,fill=injuries))+
   geom_bar(stat="identity")+
+  coord_flip()+
   geom_text(aes(label=injuries))+
   theme(axis.text.x=element_text(angle=90))+
   xlab("EVTYPE")+
   ylab("Number of injuries")
-library(gridExtra)
-grid.arrange(g1, g2, nrow =2)
+
+grid.arrange(g1,g2, nrow=2)
   
 ```
 
+2. Across the United States, which types of events have the greatest economic consequences?
+
+```{r}
+propdamage$EVTYPE <- factor(propdamage$EVTYPE,levels = propdamage$EVTYPE)
+propdmg <- propdamage[1:10,]
+g3<-ggplot(propdmg,aes(x=reorder(EVTYPE,propdamage),y=propdamage))+
+  geom_bar(stat="identity",fill="orange")+
+  coord_flip()+
+  geom_text(aes(label=propdamage))+
+  theme(axis.text.x=element_text(angle=0))+
+  xlab("EVTYPE")+
+  ylab("the economic damage of property by weather type(US dollar)")+
+  ggtitle("Weather type TOP10 that affected the economic consequences in US")
+
+
+cropdamage$EVTYPE <- factor(cropdamage$EVTYPE,levels = cropdamage$EVTYPE)
+cropdmg <- cropdamage[1:10,]
+g4<-ggplot(cropdmg,aes(x=reorder(EVTYPE,cropdamage),y=cropdamage))+
+  geom_bar(stat="identity",fill="red")+
+  coord_flip()+
+  geom_text(aes(label=cropdamage))+
+  theme(axis.text.x=element_text(angle=0))+
+  xlab("EVTYPE")+
+  ylab("the economic damage of crops by weather type(US dollar)")
+
+grid.arrange(g3,g4,nrow=2)
+```
 
 
 
